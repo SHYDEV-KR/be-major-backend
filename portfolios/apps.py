@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class MajorsConfig(AppConfig):
+class PortfoliosConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'majors'
+    name = 'portfolios'
