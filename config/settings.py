@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import local_settings
+from .local_settings import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = local_settings.SECRET_KEY
+SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,10 +35,11 @@ THIRD_PARTY_APPS = []
 CUSTOM_APPS = [
     "common.apps.CommonConfig",
     "users.apps.UsersConfig",
-    "categories.apps.CategoriesConfig",
-    "majors.apps.MajorsConfig",
+    "moim_types.apps.MoimTypesConfig",
+    "topics.apps.TopicsConfig",
     "medias.apps.MediasConfig",
     "moims.apps.MoimsConfig",
+    "portfolios.apps.PortfoliosConfig",
 ]
 
 
