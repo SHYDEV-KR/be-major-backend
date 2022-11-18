@@ -37,7 +37,6 @@ CUSTOM_APPS = [
     "users.apps.UsersConfig",
     "moim_types.apps.MoimTypesConfig",
     "topics.apps.TopicsConfig",
-    "medias.apps.MediasConfig",
     "moims.apps.MoimsConfig",
     "portfolios.apps.PortfoliosConfig",
 ]
@@ -52,7 +51,7 @@ SYSTEM_APPS = [
     'django.contrib.staticfiles',
 ]
 
-INSTALLED_APPS = SYSTEM_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
+INSTALLED_APPS = THIRD_PARTY_APPS + CUSTOM_APPS + SYSTEM_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
