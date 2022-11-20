@@ -40,7 +40,10 @@ class Career(CommonModel):
   is_current_job = models.BooleanField(default=False)
 
   def __str__(self):
-    return f'[{self.start}~{self.end}] {self.description}'
+    if self.is_current_job:
+      return f'[{self.start}~{self.end}] {self.description}'
+    else:
+      return f'[{self.start}~] {self.description}'
 
 
 class Education(CommonModel):
