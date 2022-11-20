@@ -38,6 +38,7 @@ class Profile(models.Model):
         choices=GenderChoices.choices,
   )
   date_of_birth = models.DateField()
+  
 
   def __str__(self):
     return str(self.user)
