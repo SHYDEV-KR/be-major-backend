@@ -22,9 +22,9 @@ class Moim(CommonModel):
     ],
     default=1
   )
-  has_default_leader = models.BooleanField(default=False)
+  description = models.TextField(max_length=2000, null=True, blank=True)
   leader = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True)
-  participants = models.ManyToManyField('users.User', related_name='participating_moims')
+  participants = models.ManyToManyField('users.User', related_name='participating_moims', blank=True)
   moim_types = models.ManyToManyField('moim_types.MoimType')
   topics = models.ManyToManyField('topics.Topic')
   is_online = models.BooleanField(default=False)
@@ -40,7 +40,12 @@ class Moim(CommonModel):
   total_moim_times = models.PositiveIntegerField(
     validators=[MinValueValidator(1)]
   )
-  is_full = models.BooleanField(default=False)
+
+  def __str__(self) -> str:
+    return self.title
+
+  def get_number_of_participants(self):
+    return self.participants.count()
 
 
 class LeaderApply(CommonModel):
@@ -52,8 +57,13 @@ class LeaderApply(CommonModel):
   description = models.TextField(max_length=1000)
   portfolio = models.ManyToManyField('portfolios.Portfolio')
   
+
+  def __str__(self):
+    return f'[{self.moim}] apply from {self.owner}'
+
+
   class Meta:
-        verbose_name_plural = 'Leader Applies'
+    verbose_name_plural = 'Leader Applies'
 
 
 class CrewJoin(CommonModel):
@@ -63,4 +73,7 @@ class CrewJoin(CommonModel):
   moim = models.ForeignKey('Moim', on_delete=models.CASCADE)
   owner = models.ForeignKey('users.User', related_name='moims_joined_as_crew', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
+
+  def __str__(self):
+    return f'{self.owner} joined [{self.moim}]'
 
