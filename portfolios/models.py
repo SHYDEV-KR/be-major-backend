@@ -10,9 +10,9 @@ class Portfolio(CommonModel):
   title = models.CharField(max_length=200)
   topic = models.ManyToManyField('topics.Topic')
   bio = models.TextField(max_length=1000, null=True, blank=True)
-  urls = models.ManyToManyField('Url', null=True, blank=True)
-  careers = models.ManyToManyField('Career', null=True, blank=True)
-  education = models.ManyToManyField('Education', null=True, blank=True)
+  urls = models.ManyToManyField('Url', blank=True)
+  careers = models.ManyToManyField('Career', blank=True)
+  education = models.ManyToManyField('Education', blank=True)
 
   def __str__(self) -> str:
     return self.title
@@ -23,7 +23,7 @@ class Url(CommonModel):
   ''' Url Model Definition '''
 
   title = models.CharField(max_length=50)
-  short_description = models.CharField(max_length=100)
+  short_description = models.CharField(max_length=100, null=True, blank=True)
   url = models.URLField()
 
   def __str__(self):
