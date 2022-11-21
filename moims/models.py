@@ -56,10 +56,10 @@ class LeaderApply(CommonModel):
   owner = models.ForeignKey('users.User', related_name='moims_applied_as_leader', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
   portfolio = models.ManyToManyField('portfolios.Portfolio')
-  
+
 
   def __str__(self):
-    return f'[{self.moim}] apply from {self.owner}'
+    return f'[{self.moim}] leader apply : <User {self.owner}>'
 
 
   class Meta:
@@ -75,5 +75,5 @@ class CrewJoin(CommonModel):
   description = models.TextField(max_length=1000)
 
   def __str__(self):
-    return f'{self.owner} joined [{self.moim}]'
+    return f'[{self.moim}] crew join : <User {self.owner}>'
 
