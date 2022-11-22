@@ -55,6 +55,8 @@ class User(AbstractBaseUser, PermissionsMixin):
   is_active = models.BooleanField(default=False)
   is_superuser = models.BooleanField(default=False)
 
+  date_joined = models.DateTimeField(auto_now_add=True)
+
 
   USERNAME_FIELD = 'phone_number'
   REQUIRED_FIELDS = ['username']
