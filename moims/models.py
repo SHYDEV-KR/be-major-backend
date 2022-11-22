@@ -66,7 +66,7 @@ class LeaderApply(CommonModel):
   moim = models.ForeignKey('Moim', on_delete=models.CASCADE)
   owner = models.ForeignKey('users.User', related_name='moims_applied_as_leader', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
-  portfolio = models.ManyToManyField('portfolios.Portfolio')
+  portfolios = models.ManyToManyField('portfolios.Portfolio')
 
 
   def __str__(self):
