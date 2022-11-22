@@ -26,16 +26,18 @@ class UserManager(BaseUserManager):
 
   def create_superuser(self, phone_number, username, password):
   
-      user = self.model(            
+      user = self.create_user(            
           phone_number=phone_number,
           username=username,
-          password=password,
+          password=password
       )
       user.is_admin = True
+      user.is_staff = True
       user.is_superuser = True
+      user.is_active = True
       user.save(using=self._db)
+
       return user
-      
 
 class User(AbstractBaseUser, PermissionsMixin):    
   
@@ -48,15 +50,14 @@ class User(AbstractBaseUser, PermissionsMixin):
   is_phone_number_authenticated = models.BooleanField(default=False)
 
   username = models.CharField(max_length=30, unique=True)
-  is_active = models.BooleanField(default=True)
+  is_staff = models.BooleanField(default=False)
   is_admin = models.BooleanField(default=False)
+  is_active = models.BooleanField(default=False)
+  is_superuser = models.BooleanField(default=False)
+
 
   USERNAME_FIELD = 'phone_number'
   REQUIRED_FIELDS = ['username']
-
-  @property
-  def is_staff(self):
-    return self.is_admin
 
   def __str__(self):
     return self.username
