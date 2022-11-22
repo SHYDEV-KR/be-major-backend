@@ -56,7 +56,7 @@ class Moim(CommonModel):
     return self.title
 
   def get_number_of_participants(self):
-    return self.crewjoin_set.count()
+    return self.crewjoin_set.count() + 1
 
 
 class LeaderApply(CommonModel):
