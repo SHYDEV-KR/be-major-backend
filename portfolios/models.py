@@ -8,8 +8,8 @@ class Portfolio(CommonModel):
 
   owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
   title = models.CharField(max_length=200)
-  topic = models.ManyToManyField('topics.Topic')
-  bio = models.TextField(max_length=1000, null=True, blank=True)
+  topics = models.ManyToManyField('topics.Topic')
+  bio = models.TextField(max_length=1000)
   urls = models.ManyToManyField('Url', blank=True)
   careers = models.ManyToManyField('Career', blank=True)
   education = models.ManyToManyField('Education', blank=True)
