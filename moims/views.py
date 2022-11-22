@@ -46,7 +46,7 @@ class MoimList(APIView):
 
     def create_moim_with_response(serializer):
       with transaction.atomic(): ## 오류없이 통과하면 코드 한 번에 실행
-        new_moim = serializer.save(moim_owner=request.user)
+        new_moim = serializer.save(owner=request.user)
         try:
           add_topics_to_moim_from_request(request, new_moim)
         except Exception:
@@ -113,8 +113,8 @@ class MoimDetailForOwner(APIView):
 
     moim = self.get_object(moim_id)
     
-    #if moim.moim_owner != request.user:
-    #  raise PermissionDenied
+    if moim.owner != request.user:
+      raise PermissionDenied
     
     serializer = MoimDetailSerializer(moim)
     return Response(serializer.data)
@@ -122,7 +122,7 @@ class MoimDetailForOwner(APIView):
 
   def delete(self, request, moim_id):
     moim = self.get_object(moim_id)
-    if moim.moim_owner != request.user:
+    if moim.owner != request.user:
       raise PermissionDenied
 
     moim.delete()
@@ -144,15 +144,14 @@ class ChangeMoimCloseState(APIView):
 
     moim = self.get_object(moim_id)
     
-    if moim.moim_owner != request.user:
+    if moim.owner != request.user:
       raise PermissionDenied
-
-    if moim.crewjoin_set.count() < moim.min_participants:
-      raise ValidationError("Cannot close moim : not enough number of participants.")
 
     if moim.is_closed:
       moim.is_closed = False
     else:
+      if moim.get_number_of_participants() < moim.min_participants:
+        raise ValidationError("Cannot close moim : not enough number of participants.")
       moim.is_closed = True
 
     moim.save()
@@ -176,7 +175,7 @@ class ChooseLeader(APIView):
 
     moim = self.get_object(moim_id)
     
-    if moim.moim_owner != request.user:
+    if moim.owner != request.user:
       raise PermissionDenied
     
     if not request.data.get("leader"):
@@ -263,7 +262,7 @@ class LeaderApply(APIView):
       with transaction.atomic():
         new_leader_apply = serializer.save(owner=request.user, moim=moim)
         try:
-          portfolios = request.data.get("portfolio")
+          portfolios = request.data.get("portfolios")
           for portfolio_id in portfolios:
             portfolio = Portfolio.objects.get(pk=portfolio_id)
             if portfolio.owner != request.user:
