@@ -10,7 +10,7 @@ class Moim(CommonModel):
 
   ''' Moim Model Definition '''
 
-  moim_owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='owning_moims')
+  owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='owning_moims')
   title = models.CharField(max_length=200)
   max_participants = models.PositiveIntegerField(
     validators=[
