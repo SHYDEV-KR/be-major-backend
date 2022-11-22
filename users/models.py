@@ -1,29 +1,68 @@
-import email
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.validators import RegexValidator
 
+from common.models import CommonModel
 
-class User(AbstractUser):
+class UserManager(BaseUserManager):    
+  use_in_migrations = True
+  
+  def create_user(self, phone_number, username, password):
+      
+      if not phone_number:
+          raise ValueError('must have user phone_number.')
+      if not username:
+          raise ValueError('must have username.')
+      if not password:
+          raise ValueError('must have user password.')
+
+      user = self.model(            
+          phone_number=phone_number,
+          username=username,
+      )        
+      user.set_password(password)        
+      user.save(using=self._db)
+      return user
+
+  def create_superuser(self, phone_number, username, password):
+  
+      user = self.model(            
+          phone_number=phone_number,
+          username=username,
+          password=password,
+      )
+      user.is_admin = True
+      user.is_superuser = True
+      user.save(using=self._db)
+      return user
+      
+
+class User(AbstractBaseUser, PermissionsMixin):    
   
   ''' User Model Definition '''
-
-  # not using first, last name
-  first_name = models.CharField(max_length=30, editable=False)
-  last_name = models.CharField(max_length=150, editable=False)
   
-  # custom
+  objects = UserManager()
+  
   phone_regex = RegexValidator(regex=r'^\d{10,11}$', message="Phone number must be entered in the format: '01012345678'. Up to 11 digits allowed.")
   phone_number = models.CharField(validators=[phone_regex], max_length=11, unique=True)
   is_phone_number_authenticated = models.BooleanField(default=False)
 
+  username = models.CharField(max_length=30, unique=True)
+  is_active = models.BooleanField(default=True)
+  is_admin = models.BooleanField(default=False)
+
   USERNAME_FIELD = 'phone_number'
+  REQUIRED_FIELDS = ['username']
+
+  @property
+  def is_staff(self):
+    return self.is_admin
 
   def __str__(self):
     return self.username
 
 
-class Profile(models.Model):
+class Profile(CommonModel):
 
   ''' Profile Model Definition '''
 
@@ -34,13 +73,16 @@ class Profile(models.Model):
 
   user = models.OneToOneField('User', unique=True, on_delete=models.CASCADE)
   is_leader = models.BooleanField(default=False)
-  avatar = models.ImageField(blank=True)
+  avatar = models.URLField(blank=True)
   gender = models.CharField(
         max_length=10,
         choices=GenderChoices.choices,
   )
   date_of_birth = models.DateField()
-  
+  email = models.EmailField(        
+      max_length=255,        
+      unique=True,    
+  )
 
   def __str__(self):
     return str(self.user)
