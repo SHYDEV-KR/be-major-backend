@@ -28,7 +28,7 @@ class MoimDetailSerializer(ModelSerializer):
 
     current_number_of_participants = SerializerMethodField()
 
-    moim_owner = SlugRelatedField(
+    owner = SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
@@ -99,7 +99,7 @@ class MoimPublicDetailSerializer(ModelSerializer):
         slug_field='username'
     )
 
-    moim_owner = SlugRelatedField(
+    owner = SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
@@ -107,7 +107,7 @@ class MoimPublicDetailSerializer(ModelSerializer):
     class Meta:
         model = Moim
         fields = (
-            "moim_owner",
+            "owner",
             "title",
             "max_participants",
             "min_participants",
@@ -143,7 +143,7 @@ class MoimMinimalSerializer(ModelSerializer):
         slug_field='username'
     )
     
-    moim_owner = SlugRelatedField(
+    owner = SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
@@ -152,7 +152,7 @@ class MoimMinimalSerializer(ModelSerializer):
         model = Moim
         fields = (
             "id",
-            "moim_owner",
+            "owner",
             "title",
             "max_participants",
             "min_participants",
@@ -174,14 +174,14 @@ class CrewJoinMinimalSerializer(ModelSerializer):
         fields = ("description", "owner")
 
 class LeaderApplyMinimalSerializer(ModelSerializer):
-    portfolio = PortfolioMinimalSerializer(
+    portfolios = PortfolioMinimalSerializer(
         read_only=True,
         many=True,
     )
 
     class Meta:
         model = LeaderApply
-        fields = ("description", "owner", "portfolio")
+        fields = ("description", "owner", "portfolios")
 
 
 class CrewJoinSerializer(ModelSerializer):
