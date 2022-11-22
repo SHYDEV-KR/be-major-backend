@@ -22,6 +22,7 @@ class Url(CommonModel):
 
   ''' Url Model Definition '''
 
+  owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
   title = models.CharField(max_length=50)
   short_description = models.CharField(max_length=100, null=True, blank=True)
   url = models.URLField()
@@ -34,6 +35,7 @@ class Career(CommonModel):
 
   ''' Career Model Definition '''
 
+  owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
   description = models.CharField(max_length=100)
   start = models.DateField()
   end = models.DateField(null=True, blank=True)
@@ -41,15 +43,16 @@ class Career(CommonModel):
 
   def __str__(self):
     if self.is_current_job:
-      return f'[{self.start}~{self.end}] {self.description}'
-    else:
       return f'[{self.start}~] {self.description}'
+    else:
+      return f'[{self.start}~{self.end}] {self.description}'
 
 
 class Education(CommonModel):
 
   ''' Education Model Definition '''
 
+  owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
   description = models.CharField(max_length=100)
 
   def __str__(self):
