@@ -8,6 +8,9 @@ class CustomUserAdmin(UserAdmin):
 
   ''' User Admin Definition '''
 
+  readonly_fields = ["date_joined"]
+
+
   fieldsets = (
     (
       "User Information",
