@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     (
       "User Information",
       {
-        "fields": ("username", "password", "email", "phone_number", "is_phone_number_authenticated"),
+        "fields": ("username",  "phone_number", "is_phone_number_authenticated", "password"),
         "classes": ("wide",),
       },
     ),
@@ -21,7 +21,7 @@ class CustomUserAdmin(UserAdmin):
       {
         "fields": (
           "is_active",
-          "is_staff",
+          "is_admin",
           "is_superuser",
           "groups",
           "user_permissions",
@@ -39,6 +39,7 @@ class CustomUserAdmin(UserAdmin):
   )
 
   list_display = ("username", "phone_number")
+  list_filter = ('is_admin',)
 
 
 @admin.register(Profile)
@@ -50,7 +51,7 @@ class ProfileAdmin(admin.ModelAdmin):
     (
       "Profile",
       {
-        "fields": ("user", "gender", "date_of_birth" ,"is_leader"),
+        "fields": ("user", "email", "gender", "date_of_birth" ,"is_leader"),
         "classes": ("wide",),
       },
     ),
