@@ -38,7 +38,7 @@ class CustomUserAdmin(UserAdmin):
     ),
   )
 
-  list_display = ("username", "email")
+  list_display = ("username", "phone_number")
 
 
 @admin.register(Profile)

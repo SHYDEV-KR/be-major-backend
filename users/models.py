@@ -13,9 +13,11 @@ class User(AbstractUser):
   last_name = models.CharField(max_length=150, editable=False)
   
   # custom
-  phone_regex = RegexValidator(regex=r'^\d{3}-\d{3,4}-\d{4}$', message="Phone number must be entered in the format: '010-0000-0000'. Up to 13 digits allowed.")
-  phone_number = models.CharField(validators=[phone_regex], max_length=13, blank=True)
+  phone_regex = RegexValidator(regex=r'^\d{10,11}$', message="Phone number must be entered in the format: '01012345678'. Up to 11 digits allowed.")
+  phone_number = models.CharField(validators=[phone_regex], max_length=11, unique=True)
   is_phone_number_authenticated = models.BooleanField(default=False)
+
+  USERNAME_FIELD = 'phone_number'
 
   def __str__(self):
     return self.username
