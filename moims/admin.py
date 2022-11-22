@@ -6,7 +6,7 @@ class MoimAdmin(admin.ModelAdmin):
 
   ''' Moim Admin Definition '''
 
-  list_display = ("title", "moim_owner")
+  list_display = ("title", "owner")
   list_filter = ("moim_types", "topics")
 
 
