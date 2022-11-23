@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Profile
+from .models import User, Profile, SMSAuth
 
 
 @admin.register(User)
@@ -59,4 +59,8 @@ class ProfileAdmin(admin.ModelAdmin):
       },
     ),
   )
-  list_display = ("user", "is_leader")
+  list_display = ("user", "is_leader", "email")
+
+@admin.register(SMSAuth)
+class SMSAuthAdmin(admin.ModelAdmin):
+  pass
