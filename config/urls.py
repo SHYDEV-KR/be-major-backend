@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/moims/", include("moims.urls")),
     path("api/v1/portfolios/", include("portfolios.urls")),
+    path("api/v1/users/", include("users.urls")),
 ]
