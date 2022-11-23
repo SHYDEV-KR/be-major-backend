@@ -130,7 +130,6 @@ class CareerViewSet(viewsets.ModelViewSet):
     if request.user != career.owner:
       return Response({"detail" : "method only allowed to owner."}, status=status.HTTP_406_NOT_ACCEPTABLE)
     
-    request.data['owner'] = request.user.id
     return super().partial_update(request, pk)
 
 
@@ -156,7 +155,6 @@ class UrlViewSet(viewsets.ModelViewSet):
     if request.user != url.owner:
       return Response({"detail" : "method only allowed to owner."}, status=status.HTTP_406_NOT_ACCEPTABLE)
     
-    request.data['owner'] = request.user.id
     return super().partial_update(request, pk)
 
 
@@ -182,7 +180,6 @@ class EducationViewSet(viewsets.ModelViewSet):
     if request.user != education.owner:
       return Response({"detail" : "method only allowed to owner."}, status=status.HTTP_406_NOT_ACCEPTABLE)
     
-    request.data['owner'] = request.user.id
     return super().partial_update(request, pk)
 
 
