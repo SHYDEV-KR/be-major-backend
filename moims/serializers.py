@@ -193,3 +193,17 @@ class LeaderApplySerializer(ModelSerializer):
     class Meta:
         model = LeaderApply
         fields = "__all__"
+
+
+class CrewJoinListSerializer(ModelSerializer):
+    moim = MoimMinimalSerializer()
+    class Meta:
+        model = CrewJoin
+        fields = "__all__"
+
+
+class LeaderApplyListSerializer(ModelSerializer):
+    moim = MoimMinimalSerializer()
+    class Meta:
+        model = LeaderApply
+        fields = "__all__"
