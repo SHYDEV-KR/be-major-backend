@@ -22,7 +22,12 @@ class MoimList(APIView):
     ''' Show Moim List '''
 
     all_moims = Moim.objects.all()
-    serializer = MoimMinimalSerializer(all_moims, many=True)
+    serializer = MoimMinimalSerializer(
+      all_moims, 
+      many=True, 
+      read_only=True, 
+      context={"request" : request}
+    )
     return Response(serializer.data)
 
 
@@ -94,7 +99,7 @@ class MoimDetail(APIView):
     ''' Show Public Moim Detail '''
 
     moim = self.get_object(moim_id)
-    serializer = MoimPublicDetailSerializer(moim)
+    serializer = MoimPublicDetailSerializer(moim, context={'request':request})
     return Response(serializer.data)
 
 
@@ -116,7 +121,7 @@ class MoimDetailForOwner(APIView):
     if moim.owner != request.user:
       raise PermissionDenied
     
-    serializer = MoimDetailSerializer(moim)
+    serializer = MoimDetailSerializer(moim, context={'request':request})
     return Response(serializer.data)
 
 
