@@ -1,32 +1,64 @@
-from rest_framework.serializers import ModelSerializer, SlugRelatedField
+from rest_framework.serializers import ModelSerializer, SlugRelatedField, SerializerMethodField
 from .models import Career, Education, Portfolio, Url
 
-class PortfolioMinimalSerializer(ModelSerializer):
-  topics = SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field='name'
-    )
-  class Meta:
-      model = Portfolio
-      fields = ("id", "title", "topics", "bio")
-
-
 class UrlSerializer(ModelSerializer):
+  is_owner = SerializerMethodField()
   class Meta:
       model = Url
-      fields = "__all__"
+      exclude = ("owner",)
+
+  def get_is_owner(self, url):
+    request = self.context.get("request")
+    if request:
+      return url.owner == request.user
+    return False
+
+class UrlMinimalSerializer(ModelSerializer):
+  class Meta:
+      model = Url
+      fields = ("id", "title", "short_description", "url")
 
 class CareerSerializer(ModelSerializer):
+  is_owner = SerializerMethodField()
   class Meta:
       model = Career
-      fields = "__all__"
+      exclude = ("owner",)
+
+  def get_is_owner(self, career):
+    request = self.context.get("request")
+    if request:
+      return career.owner == request.user
+    return False
+
+class CareerMinimalSerializer(ModelSerializer):
+  name = SerializerMethodField()
+  class Meta:
+      model = Career
+      fields = ("id", "name",)
+  
+  def get_name(self, career):
+    return str(career)
 
 class EducationSerializer(ModelSerializer):
+  is_owner = SerializerMethodField()
   class Meta:
       model = Education
-      fields = "__all__"
+      exclude = ("owner",)
 
+  def get_is_owner(self, education):
+    request = self.context.get("request")
+    if request:
+      return education.owner == request.user
+    return False
+
+class EducationMinimalSerializer(ModelSerializer):
+  name = SerializerMethodField()
+  class Meta:
+      model = Education
+      fields = ("id", "name",)
+
+  def get_name(self, education):
+    return str(education)
 
 class PortfolioDetailSerializer(ModelSerializer):
   topics = SlugRelatedField(
@@ -34,6 +66,7 @@ class PortfolioDetailSerializer(ModelSerializer):
         read_only=True,
         slug_field='name'
   )
+  is_owner = SerializerMethodField()
 
   urls = UrlSerializer(many=True, read_only=True)
   careers = CareerSerializer(many=True, read_only=True)
@@ -43,8 +76,37 @@ class PortfolioDetailSerializer(ModelSerializer):
     model = Portfolio
     fields = "__all__"
 
+  def get_is_owner(self, portfolio):
+    request = self.context.get("request")
+    if request:
+      return portfolio.owner == request.user
+    return False
+
 
 class PortfolioViewSetSerializer(ModelSerializer):
   class Meta:
     model = Portfolio
     fields = "__all__"
+
+class PortfolioMinimalSerializer(ModelSerializer):
+  topics = SlugRelatedField(
+    many=True,
+    read_only=True,
+    slug_field='name'
+  )
+  urls = UrlMinimalSerializer(
+    many=True,
+    read_only=True
+  )
+  careers = CareerMinimalSerializer(
+    many=True,
+    read_only=True
+  )
+  education = EducationMinimalSerializer(
+    many=True,
+    read_only=True
+  )
+
+  class Meta:
+    model = Portfolio
+    fields = ("id", "title", "topics", "bio", "urls", "careers", "education")
