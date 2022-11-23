@@ -64,7 +64,7 @@ class LeaderApply(CommonModel):
   ''' LeaderApply Model Definition '''
 
   moim = models.ForeignKey('Moim', on_delete=models.CASCADE)
-  owner = models.ForeignKey('users.User', related_name='moims_applied_as_leader', on_delete=models.CASCADE)
+  owner = models.ForeignKey('users.User', related_name='leader_applies', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
   portfolios = models.ManyToManyField('portfolios.Portfolio')
 
@@ -82,7 +82,7 @@ class CrewJoin(CommonModel):
   ''' CrewJoin Model Definition '''
 
   moim = models.ForeignKey('Moim', on_delete=models.CASCADE)
-  owner = models.ForeignKey('users.User', related_name='moims_joined_as_crew', on_delete=models.CASCADE)
+  owner = models.ForeignKey('users.User', related_name='crew_joins', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
 
   def __str__(self):
