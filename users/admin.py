@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
     (
       "User Information",
       {
-        "fields": ("username",  "phone_number", "is_phone_number_authenticated", "password"),
+        "fields": ("username",  "phone_number", "password"),
         "classes": ("wide",),
       },
     ),
