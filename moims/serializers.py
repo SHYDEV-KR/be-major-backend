@@ -42,6 +42,10 @@ class MoimDetailSerializer(ModelSerializer):
     joined_crews = SerializerMethodField()
     applied_leaders = SerializerMethodField()
 
+    is_crew = SerializerMethodField()
+    is_leader = SerializerMethodField()
+    is_owner = SerializerMethodField()
+
 
     class Meta:
         model = Moim
@@ -76,8 +80,25 @@ class MoimDetailSerializer(ModelSerializer):
 
     def get_applied_leaders(self, moim):
         return LeaderApplyMinimalSerializer(moim.leaderapply_set.all(), many=True, read_only=True).data
+    
+    def get_is_crew(self, moim):
+        request = self.context.get("request")
+        if request:
+            print(moim.crewjoin_set.all())
+            return moim.crewjoin_set.filter(owner=request.user).exists()
+        return False
 
-    ''' todo join, apply 에서 정보 가지고 와서 보여주기 '''
+    def get_is_leader(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.leader == request.user
+        return False
+
+    def get_is_owner(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.owner == request.user
+        return False
 
 
 class MoimPublicDetailSerializer(ModelSerializer):
@@ -104,6 +125,10 @@ class MoimPublicDetailSerializer(ModelSerializer):
         slug_field='username'
     )
 
+    is_crew = SerializerMethodField()
+    is_leader = SerializerMethodField()
+    is_owner = SerializerMethodField()
+
     class Meta:
         model = Moim
         fields = (
@@ -120,10 +145,32 @@ class MoimPublicDetailSerializer(ModelSerializer):
             "description",
             "first_date",
             "total_moim_times",
+            "is_crew",
+            "is_leader",
+            "is_owner",
         )
 
     def get_current_number_of_participants(self, moim):
         return moim.get_number_of_participants()
+
+    def get_is_crew(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.crewjoin_set.filter(owner=request.user).exists()
+        return False
+
+    def get_is_leader(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.leader == request.user
+        return False
+
+    def get_is_owner(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.owner == request.user
+        return False
+
 
 
 class MoimMinimalSerializer(ModelSerializer):
@@ -147,6 +194,10 @@ class MoimMinimalSerializer(ModelSerializer):
         read_only=True,
         slug_field='username'
     )
+
+    is_crew = SerializerMethodField()
+    is_leader = SerializerMethodField()
+    is_owner = SerializerMethodField()
     
     class Meta:
         model = Moim
@@ -162,10 +213,31 @@ class MoimMinimalSerializer(ModelSerializer):
             "topics",
             "target_amount",
             "expiration_date",
+            "is_crew",
+            "is_leader",
+            "is_owner",
         )
 
     def get_current_number_of_participants(self, moim):
         return moim.get_number_of_participants()
+
+    def get_is_crew(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.crewjoin_set.filter(owner=request.user).exists()
+        return False
+
+    def get_is_leader(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.leader == request.user
+        return False
+
+    def get_is_owner(self, moim):
+        request = self.context.get("request")
+        if request:
+            return moim.owner == request.user
+        return False
 
 
 class CrewJoinMinimalSerializer(ModelSerializer):
