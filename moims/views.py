@@ -261,6 +261,8 @@ class LeaderApply(APIView):
       raise ParseError("Already Joined this moim as crew.")
     if moim.is_closed:
       raise ParseError("Moim closed.")
+    if not request.user.profile.is_leader:
+      raise ParseError("Not A leader.")
 
     serializer = LeaderApplySerializer(data=request.data)
     if serializer.is_valid():
