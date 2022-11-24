@@ -23,7 +23,6 @@ class PortfolioViewSet(viewsets.ModelViewSet):
 
 
   def create(self, request):
-    request.data['owner'] = request.user.id
     serializer = self.get_serializer(data=request.data)
     if serializer.is_valid():
       new_portfolio = serializer.save(owner=self.request.user)
@@ -76,8 +75,8 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     
     if request.user != portfolio.owner:
       return Response({"detail" : "method only allowed to owner."}, status=status.HTTP_406_NOT_ACCEPTABLE)
-    
-    request.data['owner'] = request.user.id
+    if request.data.get('owner') and request.data.get('owner') != request.user:
+      return Response({"detail" : "cannot change owner"}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     urls = request.data.get('urls')
     if urls:
@@ -102,7 +101,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
           raise ParseError("no education.")
         if not request.user.education_set.filter(pk=education_id).exists():
           raise ParseError("not user education.")
-    
+
 
     return super().partial_update(request, pk)
 
