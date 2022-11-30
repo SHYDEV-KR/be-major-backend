@@ -6,7 +6,7 @@ databases:
 
 services:
   - type: web
-    name: be_major-backend
+    name: be_major
     env: python
     region: singapore
     buildCommand: "./build.sh"
