@@ -1,8 +1,10 @@
 from dataclasses import field
+from django.http import request
 from rest_framework.serializers import ModelSerializer, SlugRelatedField, SerializerMethodField
 from rest_framework import serializers
 from .models import CrewJoin, LeaderApply, Moim
-from portfolios.serializers import PortfolioMinimalSerializer
+from portfolios.serializers import UrlMinimalSerializer
+from users.serializers import PublicProfileSerializer
 from rest_framework.exceptions import ValidationError
 import datetime
 
@@ -20,31 +22,16 @@ class MoimDetailSerializer(ModelSerializer):
         slug_field='name'
     )
 
-    participants = SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field='username'
-    )
-
     current_number_of_participants = SerializerMethodField()
-
-    owner = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
-
-    leader = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
-
-
+    owner = PublicProfileSerializer()
+    leader = PublicProfileSerializer(read_only=True)
     joined_crews = SerializerMethodField()
     applied_leaders = SerializerMethodField()
-
     is_crew = SerializerMethodField()
     is_leader = SerializerMethodField()
     is_owner = SerializerMethodField()
+    has_leader = SerializerMethodField()
+    has_applied = SerializerMethodField()
 
 
     class Meta:
@@ -83,22 +70,49 @@ class MoimDetailSerializer(ModelSerializer):
     
     def get_is_crew(self, moim):
         request = self.context.get("request")
-        if request:
-            print(moim.crewjoin_set.all())
-            return moim.crewjoin_set.filter(owner=request.user).exists()
+        if request.user.is_authenticated and request.user.profile:
+            return moim.crewjoin_set.filter(owner=request.user.profile.id).exists()
         return False
 
     def get_is_leader(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.leader == request.user
+        if request.user.is_authenticated and request.user.profile:
+            if moim.leader:
+                return moim.leader.id == request.user.profile.id
         return False
 
     def get_is_owner(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.owner == request.user
+        if request.user.is_authenticated and request.user.profile:
+            return moim.owner.id == request.user.profile.id
         return False
+
+
+    def get_has_leader(self, moim):
+        if moim.leader:
+            return True
+        return False
+
+    def get_has_applied(self, moim):
+        request = self.context.get("request")
+        if request.user.is_authenticated and request.user.profile:
+            return request.user.profile.leader_applies.filter(moim=moim.id).exists()
+        return False
+
+
+class MoimDetailFromLeaderAppliesSerializer(ModelSerializer):
+    moim = MoimDetailSerializer()
+
+    class Meta:
+        model = LeaderApply
+        fields = ("moim",)
+
+class MoimDetailFromCrewjoinsSerializer(ModelSerializer):
+    moim = MoimDetailSerializer()
+
+    class Meta:
+        model = CrewJoin
+        fields = ("moim",)
 
 
 class MoimPublicDetailSerializer(ModelSerializer):
@@ -115,23 +129,23 @@ class MoimPublicDetailSerializer(ModelSerializer):
 
     current_number_of_participants = SerializerMethodField()
 
-    leader = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
+    leader = PublicProfileSerializer()
 
-    owner = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
+    owner = PublicProfileSerializer()
 
     is_crew = SerializerMethodField()
     is_leader = SerializerMethodField()
     is_owner = SerializerMethodField()
+    has_leader = SerializerMethodField()
+    has_applied = SerializerMethodField()
+    my_leader_apply_id = SerializerMethodField()
+    my_crew_join_id = SerializerMethodField()
+    leader_apply_id = SerializerMethodField()
 
     class Meta:
         model = Moim
         fields = (
+            "id",
             "owner",
             "title",
             "max_participants",
@@ -145,9 +159,15 @@ class MoimPublicDetailSerializer(ModelSerializer):
             "description",
             "first_date",
             "total_moim_times",
+            "location",
             "is_crew",
             "is_leader",
             "is_owner",
+            "has_leader",
+            "has_applied",
+            "my_leader_apply_id",
+            "my_crew_join_id",
+            "leader_apply_id"
         )
 
     def get_current_number_of_participants(self, moim):
@@ -155,21 +175,53 @@ class MoimPublicDetailSerializer(ModelSerializer):
 
     def get_is_crew(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.crewjoin_set.filter(owner=request.user).exists()
+        if request.user.is_authenticated and request.user.profile:
+            return moim.crewjoin_set.filter(owner=request.user.profile.id).exists()
         return False
 
     def get_is_leader(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.leader == request.user
+        if request.user.is_authenticated and request.user.profile:
+            if moim.leader:
+                return moim.leader.id == request.user.profile.id
         return False
 
     def get_is_owner(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.owner == request.user
+        if request.user.is_authenticated and request.user.profile:
+            return moim.owner.id == request.user.profile.id
         return False
+
+    def get_has_leader(self, moim):
+        if moim.leader:
+            return True
+        return False
+
+    def get_has_applied(self, moim):
+        request = self.context.get("request")
+        if request.user.is_authenticated and request.user.profile:
+            return request.user.profile.leader_applies.filter(moim=moim.id).exists()
+        return False
+
+    def get_my_leader_apply_id(self, moim):
+        request = self.context.get("request")
+        if request.user.is_authenticated and request.user.profile:
+            if request.user.profile.leader_applies.filter(moim=moim.id).exists():
+                return request.user.profile.leader_applies.get(moim=moim.id).id
+        return 0
+
+    def get_my_crew_join_id(self, moim):
+        request = self.context.get("request")
+        if request.user.is_authenticated and request.user.profile:
+            if request.user.profile.crew_joins.filter(moim=moim.id).exists():
+                return request.user.profile.crew_joins.get(moim=moim.id).id
+        return 0
+
+    def get_leader_apply_id(self, moim):
+        if moim.leader:
+            if moim.leader.leader_applies.filter(moim=moim.id).exists():
+                return moim.leader.leader_applies.get(moim=moim.id).id
+        return 0
 
 
 
@@ -185,19 +237,13 @@ class MoimMinimalSerializer(ModelSerializer):
         slug_field='name'
     )
     current_number_of_participants = SerializerMethodField()
-    leader = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
-    
-    owner = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
-    )
+    leader = PublicProfileSerializer()  
+    owner = PublicProfileSerializer()
 
     is_crew = SerializerMethodField()
     is_leader = SerializerMethodField()
     is_owner = SerializerMethodField()
+    has_leader = SerializerMethodField()
     
     class Meta:
         model = Moim
@@ -216,6 +262,7 @@ class MoimMinimalSerializer(ModelSerializer):
             "is_crew",
             "is_leader",
             "is_owner",
+            "has_leader",
         )
 
     def get_current_number_of_participants(self, moim):
@@ -223,40 +270,50 @@ class MoimMinimalSerializer(ModelSerializer):
 
     def get_is_crew(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.crewjoin_set.filter(owner=request.user).exists()
+        if request.user.is_authenticated and request.user.profile:
+            return moim.crewjoin_set.filter(owner=request.user.profile.id).exists()
         return False
 
     def get_is_leader(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.leader == request.user
+        if request.user.is_authenticated and request.user.profile:
+            if moim.leader:
+                return moim.leader.id == request.user.profile.id
+        return False
+
+    def get_has_leader(self, moim):
+        if moim.leader:
+            return True
         return False
 
     def get_is_owner(self, moim):
         request = self.context.get("request")
-        if request:
-            return moim.owner == request.user
+        if request.user.is_authenticated and request.user.profile:
+            return moim.owner.id == request.user.profile.id
         return False
 
 
 class CrewJoinMinimalSerializer(ModelSerializer):
+    owner = PublicProfileSerializer(read_only=True)
     class Meta:
         model = CrewJoin
-        fields = ("description", "owner")
+        fields = ("id", "moim", "description", "owner")
 
 class LeaderApplyMinimalSerializer(ModelSerializer):
-    portfolios = PortfolioMinimalSerializer(
+    portfolios = UrlMinimalSerializer(
         read_only=True,
         many=True,
     )
+    owner = PublicProfileSerializer(read_only=True)
 
     class Meta:
         model = LeaderApply
-        fields = ("description", "owner", "portfolios")
+        fields = ("id", "moim", "description", "owner", "portfolios")
 
 
 class CrewJoinSerializer(ModelSerializer):
+    owner = PublicProfileSerializer(read_only=True)
+    moim = MoimMinimalSerializer(read_only=True)
     class Meta:
         model = CrewJoin
         fields = "__all__"
