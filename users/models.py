@@ -14,6 +14,10 @@ from django.dispatch import receiver
 import requests
 from common.models import CommonModel
 from config import local_settings
+import environ
+
+env = environ.Env()
+
 
 class UserManager(BaseUserManager):    
     def create_user(self, phone_number, username, password):
@@ -121,21 +125,21 @@ class SMSAuth(CommonModel):
     is_phone_number_authenticated = models.BooleanField(default=False)
 
     def make_signature(self, string):
-        secret_key = bytes(local_settings.NCP_SECRET_KEY, 'UTF-8')
+        secret_key = bytes(env("NCP_SECRET_KEY"), 'UTF-8')
         message = bytes(string, 'UTF-8')
         return base64.b64encode(hmac.new(secret_key, message, digestmod=hashlib.sha256).digest())
 
     def send_sms(self):
         base_url = f'https://sens.apigw.ntruss.com'
-        uri = f'/sms/v2/services/{local_settings.NCP_SERVICE_ID}/messages'
+        uri = f'/sms/v2/services/{env("NCP_SERVICE_ID")}/messages'
 
         timestamp = str(int(time.time() * 1000))
-        message = "POST" + " " + uri + "\n" + timestamp + "\n" + local_settings.NCP_ACCESS_KEY_ID
+        message = "POST" + " " + uri + "\n" + timestamp + "\n" + env("NCP_ACCESS_KEY_ID")
         
         body = {
             "type": "SMS",
             "contentType": "COMM",
-            "from": local_settings.SENDER_PHONE_NUMBER,
+            "from": env("SENDER_PHONE_NUMBER"),
             "content": f"[be_major] 인증 번호 [{self.auth_number}]를 입력해주세요.",
             "messages" : [{"to": self.phone_number}]
         }
@@ -143,7 +147,7 @@ class SMSAuth(CommonModel):
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
             "x-ncp-apigw-timestamp": timestamp,
-            "x-ncp-iam-access-key": local_settings.NCP_ACCESS_KEY_ID,
+            "x-ncp-iam-access-key": env("NCP_ACCESS_KEY_ID"),
             "x-ncp-apigw-signature-v2": self.make_signature(message),
         }
         requests.post(base_url + uri, data=json.dumps(body), headers=headers)
