@@ -1,5 +1,5 @@
 databases:
-  - name: be_major-db
+  - name: be_major
     databaseName: be_major
     user: be_major
     region: singapore
