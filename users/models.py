@@ -13,7 +13,6 @@ from django.dispatch import receiver
 
 import requests
 from common.models import CommonModel
-from config import local_settings
 import environ
 
 env = environ.Env()
