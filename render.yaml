@@ -1,20 +1,20 @@
 databases:
-  - name: be_major
-    databaseName: be_major
-    user: be_major
+  - name: config
+    databaseName: config
+    user: config
     region: singapore
 
 services:
   - type: web
-    name: be_major
+    name: config
     env: python
     region: singapore
     buildCommand: "./build.sh"
-    startCommand: "gunicorn be_major.wsgi:application"
+    startCommand: "gunicorn config.wsgi:application"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: be_major
+          name: config
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
