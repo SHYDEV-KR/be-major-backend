@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["SHY <ekdmbzzang@naver.com>"]
 readme = "README.md"
-packages = [{include = "be_major_backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
