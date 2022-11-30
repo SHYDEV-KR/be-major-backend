@@ -40,6 +40,9 @@ class CustomUserAdmin(UserAdmin):
       },
     ),
   )
+  add_fieldsets = ((None, {
+    'fields': ('username', 'phone_number', 'password1', 'password2')
+  }),)
 
   list_display = ("username", "phone_number")
   list_filter = ('is_admin',)
@@ -54,12 +57,12 @@ class ProfileAdmin(admin.ModelAdmin):
     (
       "Profile",
       {
-        "fields": ("user", "email", "gender", "date_of_birth" ,"is_leader"),
+        "fields": ("user", "avatar","major", "email", "gender", "date_of_birth"),
         "classes": ("wide",),
       },
     ),
   )
-  list_display = ("user", "is_leader", "email")
+  list_display = ("user", "email")
 
 @admin.register(SMSAuth)
 class SMSAuthAdmin(admin.ModelAdmin):

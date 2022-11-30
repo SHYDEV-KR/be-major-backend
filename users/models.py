@@ -8,6 +8,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.core.validators import RegexValidator
 import datetime
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 import requests
 from common.models import CommonModel
@@ -83,13 +85,18 @@ class Profile(CommonModel):
         ELSE = ("else", "기타")
 
     user = models.OneToOneField('User', unique=True, on_delete=models.CASCADE)
-    is_leader = models.BooleanField(default=False)
+    major = models.CharField(blank=True, max_length=20)
     avatar = models.URLField(blank=True)
     gender = models.CharField(
             max_length=10,
             choices=GenderChoices.choices,
+            blank=True,
+            null=True,
     )
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(
+        blank=True,
+        null=True,
+    )
     email = models.EmailField(        
         max_length=255,        
         unique=True,
@@ -100,6 +107,12 @@ class Profile(CommonModel):
     def __str__(self):
         return str(self.user)
 
+@receiver(post_save, sender=User)
+def create_Profile(sender, instance, created, **kwargs):
+    """Create Profile for every new User."""
+    if created:
+        if not hasattr(instance, 'Profile'):
+            Profile.objects.create(user=instance)
 
 class SMSAuth(CommonModel):
     phone_regex = RegexValidator(regex=r'^\d{10,11}$', message="Phone number must be entered in the format: '01012345678'. Up to 11 digits allowed.")

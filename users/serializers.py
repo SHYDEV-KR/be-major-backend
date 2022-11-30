@@ -1,16 +1,9 @@
 from asyncore import read
 from dataclasses import field
+from xml.etree.ElementInclude import include
 from django.forms import models
 from rest_framework import serializers
 from .models import Profile, User
-
-class MinimalUserSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = User
-    fields= (
-      "avatar",
-      "username"
-    )
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -59,4 +52,4 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Profile
-    exclude = ("email",)
+    fields = ("id", "user", "avatar",)

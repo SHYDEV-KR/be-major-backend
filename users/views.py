@@ -134,16 +134,17 @@ class LogIn(APIView):
     )
     if user:
       login(request, user)
-      return Response(serializers.PrivateUserSerializer(user).data)
+      return Response({"ok": "Welcome!"})
     else:
-      return Response({"error": "wrong password"})
+      return Response({"error": "wrong password"},
+      status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogOut(APIView):
   
   permission_classes = [IsAuthenticated]
 
-  def post(self, request):
+  def get(self, request):
     logout(request)
     return Response({"ok": "bye!"})
 
@@ -236,14 +237,26 @@ class UserCareers(APIView):
     return Response(serializer.data)
 
 
+class MyUrls(APIView):
+  permission_classes = [IsAuthenticated]
+
+  def get(self, request):
+    try:
+      profile = request.user.profile
+    except:
+      raise ParseError
+    urls = profile.url_set.all()
+    serializer = portfolios_serializers.UrlMinimalSerializer(urls, many=True, read_only=True)
+    return Response(serializer.data)
+
 class UserUrls(APIView):
   def get(self, request, username):
     try:
       user = User.objects.get(username=username)
+      profile = Profile.objects.get(user=user)
     except:
       raise ParseError
-    
-    urls = user.url_set.all()
+    urls = profile.url_set.all()
     serializer = portfolios_serializers.UrlMinimalSerializer(urls, many=True, read_only=True)
     return Response(serializer.data)
 
@@ -273,6 +286,55 @@ class UserMoimAsCrew(APIView):
       return Response(status=status.HTTP_204_NO_CONTENT)
     
     serializer = moims_serializers.CrewJoinListSerializer(crew_joins, many=True, read_only=True)
+    return Response(serializer.data)
+
+
+class MyMoimAsLeader(APIView):
+  permission_classes = [IsAuthenticated]
+  def get(self, request):
+    try:
+      user = request.user.profile
+    except:
+      raise ParseError
+    
+    leader_applies = user.leader_applies.all()
+
+    if not leader_applies:
+      return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    serializer = moims_serializers.MoimDetailFromLeaderAppliesSerializer(leader_applies, many=True, read_only=True, context={"request" : request})
+    return Response([data['moim'] for data in serializer.data])
+
+class MyMoimAsCrew(APIView):
+  permission_classes = [IsAuthenticated]
+  def get(self, request):
+    try:
+      user = request.user.profile
+    except:
+      raise ParseError
+    
+    crew_joins = user.crew_joins.all()
+
+    if not crew_joins:
+      return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    serializer = moims_serializers.MoimDetailFromCrewjoinsSerializer(crew_joins, many=True, read_only=True, context={"request" : request})
+    return Response([data['moim'] for data in serializer.data])
+
+class MyMoimAsOwner(APIView):
+  permission_classes = [IsAuthenticated]
+  def get(self, request):
+    try:
+      user = request.user.profile
+    except:
+      raise ParseError
+    
+    owning_moims = user.owning_moims.all()
+
+    if not owning_moims:
+      return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    serializer = moims_serializers.MoimDetailSerializer(owning_moims, many=True, read_only=True, context={"request" : request})
     return Response(serializer.data)
 
 
