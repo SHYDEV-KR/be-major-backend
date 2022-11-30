@@ -148,6 +148,14 @@ class UrlViewSet(viewsets.ModelViewSet):
     IsAuthenticatedOrReadOnly,
   ]
 
+  def create(self, request):
+    serializer = self.get_serializer(data=request.data)
+    if serializer.is_valid():
+      serializer.save(owner=self.request.user.profile)
+      return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+      return Response(status=status.HTTP_400_BAD_REQUEST)
+
   def partial_update(self, request, pk=None):
     url = Url.objects.get(pk=pk)
     

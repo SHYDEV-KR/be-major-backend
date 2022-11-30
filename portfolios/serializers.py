@@ -10,13 +10,20 @@ class UrlSerializer(ModelSerializer):
   def get_is_owner(self, url):
     request = self.context.get("request")
     if request:
-      return url.owner == request.user
+      return url.owner.id == request.user.profile.id
     return False
 
 class UrlMinimalSerializer(ModelSerializer):
+  is_owner = SerializerMethodField()
   class Meta:
       model = Url
-      fields = ("id", "title", "short_description", "url")
+      fields = ("id", "title", "short_description", "url", "is_owner")
+  
+  def get_is_owner(self, url):
+    request = self.context.get("request")
+    if request:
+      return url.owner.id == request.user.profile.id
+    return False
 
 class CareerSerializer(ModelSerializer):
   is_owner = SerializerMethodField()
@@ -27,7 +34,7 @@ class CareerSerializer(ModelSerializer):
   def get_is_owner(self, career):
     request = self.context.get("request")
     if request:
-      return career.owner == request.user
+      return career.owner.id == request.user.profile.id
     return False
 
 class CareerMinimalSerializer(ModelSerializer):
@@ -48,7 +55,7 @@ class EducationSerializer(ModelSerializer):
   def get_is_owner(self, education):
     request = self.context.get("request")
     if request:
-      return education.owner == request.user
+      return education.owner.id == request.user.profile.id
     return False
 
 class EducationMinimalSerializer(ModelSerializer):
@@ -79,7 +86,7 @@ class PortfolioDetailSerializer(ModelSerializer):
   def get_is_owner(self, portfolio):
     request = self.context.get("request")
     if request:
-      return portfolio.owner == request.user
+      return portfolio.owner.id == request.user.profile.id
     return False
 
 

@@ -6,8 +6,8 @@ class Portfolio(CommonModel):
 
   ''' Portfolio Model Definition '''
 
-  owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
-  title = models.CharField(max_length=200)
+  owner = models.ForeignKey('users.Profile', on_delete=models.CASCADE)
+  title = models.CharField(max_length=10)
   topics = models.ManyToManyField('topics.Topic')
   bio = models.TextField(max_length=1000)
   urls = models.ManyToManyField('Url', blank=True)
@@ -22,9 +22,9 @@ class Url(CommonModel):
 
   ''' Url Model Definition '''
 
-  owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
-  title = models.CharField(max_length=50)
-  short_description = models.CharField(max_length=100, null=True, blank=True)
+  owner = models.ForeignKey('users.Profile', on_delete=models.CASCADE)
+  title = models.CharField(max_length=20)
+  short_description = models.CharField(max_length=200, null=True, blank=True)
   url = models.URLField()
 
   def __str__(self):
@@ -35,7 +35,7 @@ class Career(CommonModel):
 
   ''' Career Model Definition '''
 
-  owner = models.ForeignKey('users.User', on_delete=models.CASCADE)
+  owner = models.ForeignKey('users.Profile', on_delete=models.CASCADE)
   description = models.CharField(max_length=100)
   start = models.DateField()
   end = models.DateField(null=True, blank=True)

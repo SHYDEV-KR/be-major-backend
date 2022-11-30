@@ -17,6 +17,10 @@ urlpatterns = [
     "delete": "destroy"
   })),
 
+  path("urls", views.UrlViewSet.as_view({
+    "post": "create",
+  })),
+
   path("urls/<int:pk>", views.UrlViewSet.as_view({
     "get" : "retrieve",
     "put": "partial_update",
