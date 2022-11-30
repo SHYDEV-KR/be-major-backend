@@ -1,12 +1,12 @@
 databases:
-  - name: config
-    databaseName: config
-    user: config
+  - name: be_major-db
+    databaseName: be_major
+    user: be_major
     region: singapore
 
 services:
   - type: web
-    name: config
+    name: be_major-backend
     env: python
     region: singapore
     buildCommand: "./build.sh"
@@ -14,7 +14,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: config
+          name: be_major
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
