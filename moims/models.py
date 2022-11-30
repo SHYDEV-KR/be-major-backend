@@ -10,8 +10,8 @@ class Moim(CommonModel):
 
   ''' Moim Model Definition '''
 
-  owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='owning_moims')
-  title = models.CharField(max_length=200)
+  owner = models.ForeignKey('users.Profile', on_delete=models.CASCADE, related_name='owning_moims')
+  title = models.CharField(max_length=20)
   max_participants = models.PositiveIntegerField(
     validators=[
       MinValueValidator(1)
@@ -25,7 +25,7 @@ class Moim(CommonModel):
     default=1
   )
   description = models.TextField(max_length=2000, null=True, blank=True)
-  leader = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True)
+  leader = models.ForeignKey('users.Profile', on_delete=models.SET_NULL, null=True, blank=True)
   moim_types = models.ManyToManyField('moim_types.MoimType')
   topics = models.ManyToManyField('topics.Topic')
   is_online = models.BooleanField(default=False)
@@ -64,9 +64,9 @@ class LeaderApply(CommonModel):
   ''' LeaderApply Model Definition '''
 
   moim = models.ForeignKey('Moim', on_delete=models.CASCADE)
-  owner = models.ForeignKey('users.User', related_name='leader_applies', on_delete=models.CASCADE)
+  owner = models.ForeignKey('users.Profile', related_name='leader_applies', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
-  portfolios = models.ManyToManyField('portfolios.Portfolio')
+  portfolios = models.ManyToManyField('portfolios.Url')
 
 
   def __str__(self):
@@ -82,7 +82,7 @@ class CrewJoin(CommonModel):
   ''' CrewJoin Model Definition '''
 
   moim = models.ForeignKey('Moim', on_delete=models.CASCADE)
-  owner = models.ForeignKey('users.User', related_name='crew_joins', on_delete=models.CASCADE)
+  owner = models.ForeignKey('users.Profile', related_name='crew_joins', on_delete=models.CASCADE)
   description = models.TextField(max_length=1000)
 
   def __str__(self):
