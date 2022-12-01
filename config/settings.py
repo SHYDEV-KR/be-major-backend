@@ -178,6 +178,5 @@ else:
 CORS_ALLOW_CREDENTIALS = True
 
 if not DEBUG:
-    CORS_ORIGIN_WHITELIST = ['https://bemajor.onrender.com']
-    SESSION_COOKIE_DOMAIN = ".bemajor.onrender.com"
-    CSRF_COOKIE_DOMAIN = ".bemajor.onrender.com"
+    SESSION_COOKIE_DOMAIN = ".bemajor.xyz"
+    CSRF_COOKIE_DOMAIN = ".bemajor.xyz"
