@@ -176,3 +176,7 @@ else:
     CSRF_TRUSTED_ORIGINS = ["https://bemajor.onrender.com"]
 
 CORS_ALLOW_CREDENTIALS = True
+
+if not DEBUG:
+    SESSION_COOKIE_DOMAIN = ".bemajor.onrender.com"
+    CSRF_COOKIE_DOMAIN = ".bemajor.onrender.com"
